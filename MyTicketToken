@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.18;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract MyTicketToken is ERC20 {
+    address public ticketIssuer;
+
+    event TicketsMinted(address indexed ticketIssuer, uint256 ticketPrice);
+    event TicketsBurned(address indexed burner, uint256 ticketPrice);
+    event TicketsTransferred(address indexed sender, address indexed ticketIssuer, uint256 ticketPrice);
+
+    modifier onlyOwner() {
+        require(msg.sender == ticketIssuer, " This action is performed only by owner");
+        _;
+    }
+
+    constructor(string memory _tokenName, string memory _tokenSymbol) ERC20(_tokenName, _tokenSymbol) {
+        ticketIssuer = msg.sender;
+        _mint(msg.sender, 100); // initial supply to 100 tickets
+    }
+
+    function mintTickets(address _ticketIssuer, uint256 _ticketPrice) public onlyOwner {
+        require(_ticketIssuer != address(0), "Incorrect ticket issuer address");
+        require(_ticketPrice > 0, "Ticket price must be greater than 0");
+
+        _mint(_ticketIssuer, _ticketPrice);
+
+        emit TicketsMinted(_ticketIssuer, _ticketPrice);
+    }
+
+    function burnTickets(uint256 _ticketPrice) public {
+        require(_ticketPrice > 0, "Ticket price must be greater than 0");
+
+        _burn(msg.sender, _ticketPrice);
+
+        emit TicketsBurned(msg.sender, _ticketPrice);
+    }
