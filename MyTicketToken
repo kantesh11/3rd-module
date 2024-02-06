@@ -36,3 +36,13 @@ contract MyTicketToken is ERC20 {
 
         emit TicketsBurned(msg.sender, _ticketPrice);
     }
+
+    function transferTickets(address _ticketIssuer, uint256 _ticketPrice) public {
+        require(_ticketIssuer != address(0), "Invalid ticket issuer address");
+        require(_ticketPrice > 0, "Ticket price must be greater than 0");
+
+        _transfer(msg.sender, _ticketIssuer, _ticketPrice);
+
+        emit TicketsTransferred(msg.sender, _ticketIssuer, _ticketPrice);
+    }
+}
